@@ -5,6 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { embeddings } from './src/oai_client.mjs';
 import { store } from './src/store_memory.mjs';
+import { getProfiles, mergeProfiles } from './src/profiles.mjs';
 
 const HOST = process.env.RANCHHAND_HOST || '127.0.0.1';
 const PORT = parseInt(process.env.RANCHHAND_PORT || '41414', 10);
@@ -64,6 +65,14 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/health') {
       return send(res, 200, { ok: true, service: 'ranchhand', host: HOST, port: PORT });
     }
+    if (req.method === 'GET' && url.pathname === '/profiles') {
+      return send(res, 200, { ok: true, profiles: getProfiles() });
+    }
+    if (req.method === 'POST' && url.pathname === '/profiles') {
+      const body = await parseJson(req);
+      const merged = mergeProfiles(body || {});
+      return send(res, 200, { ok: true, profiles: merged });
+    }
     // Auth check
     const token = req.headers['x-ranchhand-token'];
     if (token !== SECRET) return unauthorized(res);
@@ -87,9 +96,11 @@ const server = http.createServer(async (req, res) => {
       }
       // Embed (batch)
       const inputs = chunks.map(c => c.text);
+      const prof = getProfiles();
+      const embedModel = prof?.embed?.model || undefined;
       let embs;
       try {
-        const out = await embeddings({ input: inputs });
+        const out = await embeddings({ model: embedModel, input: inputs });
         embs = out?.data?.map(d => d.embedding) || [];
       } catch (e) {
         return send(res, 500, { ok: false, error: 'embed-failed', detail: String(e) });

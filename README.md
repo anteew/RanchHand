@@ -7,9 +7,10 @@ RanchHand is a minimal MCP server that fronts an OpenAI-style API. It works grea
   - `openai_models_list` → GET `/v1/models`
   - `openai_chat_completions` → POST `/v1/chat/completions`
   - `openai_embeddings_create` → POST `/v1/embeddings`
-  - Optional HTTP ingest on localhost:41414 (bind 127.0.0.1):
-    - `POST /ingest/slack` (index: chunk + embed + upsert in in-memory store)
-    - `POST /query` (kNN query with embeddings)
+- Optional HTTP ingest on localhost:41414 (bind 127.0.0.1):
+  - `POST /ingest/slack` (index: chunk + embed + upsert in in-memory store)
+  - `POST /query` (kNN query with embeddings)
+  - `GET /profiles` | `POST /profiles` (role defaults: embed, summarizers, reranker, chunking)
 - Config via env:
   - `OAI_BASE` (default `http://localhost:11434/v1`)
   - `OAI_API_KEY` (optional; some backends ignore it, Ollama allows any value)
@@ -56,6 +57,14 @@ curl -s -X POST http://127.0.0.1:41414/query \
     "topK": 5,
     "withText": true
   }'
+```
+
+Profiles:
+```bash
+curl -s http://127.0.0.1:41414/profiles
+curl -s -X POST http://127.0.0.1:41414/profiles \
+  -H "Content-Type: application/json" \
+  -d '{ "embed": { "model": "nomic-embed-text:latest" }, "chunking": { "chunk_tokens": 512 } }'
 ```
 
 ## MCP Tools
