@@ -3,7 +3,7 @@ import * as oai from '../src/oai_client.mjs';
 
 describe('oai_client httpJson and helpers', () => {
   it('listModels returns parsed json on 200', async () => {
-    const mock = vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    const mock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       text: async () => JSON.stringify({ data: [{ id: 'm1' }] }),
     });
@@ -14,7 +14,7 @@ describe('oai_client httpJson and helpers', () => {
 
   it('chatCompletion extracts text', async () => {
     const payload = { choices: [{ message: { content: 'hello' } }] };
-    const mock = vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    const mock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       text: async () => JSON.stringify(payload),
     });
@@ -27,7 +27,7 @@ describe('oai_client httpJson and helpers', () => {
   it('httpJson times out with AbortController', async () => {
     const original = process.env.OAI_TIMEOUT_MS;
     process.env.OAI_TIMEOUT_MS = '10';
-    const mock = vi.spyOn(global, 'fetch').mockImplementation(async () => {
+    const mock = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
       return new Promise((_, reject) => setTimeout(() => reject(new Error('aborted')), 20));
     });
     await expect(oai.listModels()).rejects.toBeInstanceOf(Error);
