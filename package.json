@@ -5,7 +5,8 @@
   "type": "module",
   "description": "RanchHand: OpenAI-compatible MCP server for Ollama and compatible backends.",
   "scripts": {
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "cli": "node cli.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0"
