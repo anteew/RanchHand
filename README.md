@@ -18,6 +18,26 @@ RanchHand is a minimal MCP server that fronts an OpenAI-style API. It works grea
   - `OAI_DEFAULT_MODEL` (fallback model name, e.g. `llama3:latest`)
   - `OAI_TIMEOUT_MS` (optional request timeout)
 
+## Development
+
+### Linting
+This project uses ESLint to maintain code quality and consistency.
+
+```bash
+# Run the linter to check for issues
+npm run lint
+
+# Automatically fix linting issues where possible
+npm run lint:fix
+```
+
+The linting rules enforce:
+- Consistent code style (single quotes, semicolons, 2-space indentation)
+- Error prevention (no unused variables, no undefined variables)
+- Modern JavaScript practices (const/let instead of var, arrow functions)
+
+CI will automatically run linting checks on all pull requests.
+
 ## Run (standalone)
 ```bash
 # Example with Ollama running locally
