@@ -110,3 +110,23 @@ Point your MCP config to:
 - Streaming chat completions are not implemented yet (single response per call). If your backend requires streaming, we can add an incremental content pattern that MCP clients can consume.
 - RanchHand passes through OpenAI-style payloads and shapes outputs to be OpenAI-compatible, but exact metadata (usage, token counts) depends on the backend.
  - HTTP ingest is currently an acknowledgment stub (counts + sample). Chunking/embedding/upsert will be wired next; design is pluggable for local store or Qdrant.
+
+## Development
+
+### Linting
+This project uses ESLint to maintain code quality and consistency.
+
+```bash
+# Run the linter to check for issues
+npm run lint
+
+# Automatically fix linting issues where possible
+npm run lint:fix
+```
+
+The linting rules enforce:
+- Consistent code style (single quotes, semicolons, 2-space indentation)
+- Error prevention (no unused variables, no undefined variables)
+- Modern JavaScript practices (const/let instead of var, arrow functions)
+
+CI will automatically run linting checks on all pull requests.
