@@ -3,7 +3,7 @@ import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { embeddings } from './src/oai_client.mjs';
+import { embeddings, chatCompletion } from './src/oai_client.mjs';
 import { store } from './src/store_memory.mjs';
 import { getProfiles, mergeProfiles } from './src/profiles.mjs';
 
@@ -131,6 +131,39 @@ const server = http.createServer(async (req, res) => {
       }
       const results = store.query(ns, qvec, topK, withText);
       return send(res, 200, { ok: true, results });
+    }
+
+    if (req.method === 'POST' && url.pathname === '/answer') {
+      const body = await parseJson(req);
+      const ns = String(body?.namespace || '').trim();
+      const query = String(body?.query || '');
+      const topK = Math.max(1, Math.min(10, parseInt(body?.topK || '5', 10)));
+      if (!ns || !query) return send(res, 400, { ok: false, error: 'bad-request' });
+      // Embed query
+      let qvec;
+      try {
+        const out = await embeddings({ input: query });
+        qvec = out?.data?.[0]?.embedding || [];
+      } catch (e) {
+        return send(res, 500, { ok: false, error: 'embed-failed', detail: String(e) });
+      }
+      // Retrieve context
+      const results = store.query(ns, qvec, topK, true);
+      const context = results.map((r, i) => `Source [${i+1}]:\n${String(r.text||'').slice(0, 800)}`).join('\n\n');
+      const prof = getProfiles();
+      const model = body?.model || prof?.summarize_retrieval?.model;
+      const temperature = (typeof body?.temperature === 'number') ? body.temperature : (prof?.summarize_retrieval?.temperature ?? 0.1);
+      const max_tokens = (typeof body?.max_tokens === 'number') ? body.max_tokens : (prof?.summarize_retrieval?.max_tokens ?? 256);
+      const system = 'You are a helpful assistant. Answer concisely using only the provided sources. Cite sources with bracketed numbers like [1], [2]. If unsure, say you do not have enough information.';
+      const user = `Question:\n${query}\n\nContext:\n${context}`;
+      try {
+        const out = await chatCompletion({ model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }], temperature, max_tokens });
+        const answer = out.text || '';
+        const citations = results.map((r, i) => ({ index: i+1, id: r.id, score: r.score, snippet: String(r.text||'').slice(0, 240), metadata: r.metadata }));
+        return send(res, 200, { ok: true, answer, citations, used: { topK, model, temperature, max_tokens } });
+      } catch (e) {
+        return send(res, 500, { ok: false, error: 'generate-failed', detail: String(e) });
+      }
     }
 
     if (req.method === 'GET' && url.pathname.startsWith('/secret')) {

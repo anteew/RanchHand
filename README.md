@@ -7,10 +7,11 @@ RanchHand is a minimal MCP server that fronts an OpenAI-style API. It works grea
   - `openai_models_list` → GET `/v1/models`
   - `openai_chat_completions` → POST `/v1/chat/completions`
   - `openai_embeddings_create` → POST `/v1/embeddings`
-- Optional HTTP ingest on localhost:41414 (bind 127.0.0.1):
-  - `POST /ingest/slack` (index: chunk + embed + upsert in in-memory store)
-  - `POST /query` (kNN query with embeddings)
-  - `GET /profiles` | `POST /profiles` (role defaults: embed, summarizers, reranker, chunking)
+  - Optional HTTP ingest on localhost:41414 (bind 127.0.0.1):
+    - `POST /ingest/slack` (index: chunk + embed + upsert in in-memory store)
+    - `POST /query` (kNN query with embeddings)
+    - `GET /profiles` | `POST /profiles` (role defaults: embed, summarizers, reranker, chunking)
+    - `POST /answer` (retrieve + generate answer with bracketed citations)
 - Config via env:
   - `OAI_BASE` (default `http://localhost:11434/v1`)
   - `OAI_API_KEY` (optional; some backends ignore it, Ollama allows any value)
@@ -56,6 +57,19 @@ curl -s -X POST http://127.0.0.1:41414/query \
     "query":"hello",
     "topK": 5,
     "withText": true
+  }'
+```
+
+Answer with citations:
+```bash
+SECRET=$(cat ~/.threadweaverinc/auth/shared_secret.txt)
+curl -s -X POST http://127.0.0.1:41414/answer \
+  -H "Content-Type: application/json" \
+  -H "X-Ranchhand-Token: $SECRET" \
+  -d '{
+    "namespace":"slack:T123:C456",
+    "query":"What did Dan say about hello?",
+    "topK": 3
   }'
 ```
 
