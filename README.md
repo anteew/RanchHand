@@ -1,4 +1,4 @@
-# RanchHand — OpenAI-compatible MCP Server
+# RanchHand — OpenAI-compatible MCP Server ([Architecture](ARCHITECTURE.md))
 
 RanchHand is a minimal MCP server that fronts an OpenAI-style API. It works great with Ollama's OpenAI-compatible endpoints (http://localhost:11434/v1) and should work with other OpenAI-compatible backends.
 
