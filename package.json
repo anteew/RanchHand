@@ -1,0 +1,13 @@
+{
+  "name": "ranchhand-mcp",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "RanchHand: OpenAI-compatible MCP server for Ollama and compatible backends.",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0"
+  }
+}
