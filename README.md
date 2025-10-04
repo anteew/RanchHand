@@ -37,6 +37,33 @@ The linting rules enforce:
 - Modern JavaScript practices (const/let instead of var, arrow functions)
 
 CI will automatically run linting checks on all pull requests.
+## Testing
+
+This repo uses Vitest for unit tests. External network calls are mocked, so tests run deterministically without Ollama or internet access.
+
+Commands:
+```bash
+# Run tests once
+npm test
+
+# TDD: watch mode
+npm run test:watch
+
+# With coverage report
+npm run test:coverage
+```
+
+Coverage thresholds are configured in vitest.config.mjs (initial targets):
+- Lines/Statements ≥ 60%
+- Functions ≥ 55%
+- Branches ≥ 50%
+
+These thresholds indicate the minimum proportion of code exercised by tests. They are a guardrail, not a guarantee of correctness. We can raise them as the test suite grows.
+
+Notes:
+- Tests live in tests/**/*.test.js
+- Use vi.spyOn/vi.mock to stub fetch and other external calls
+- For CI stability, avoid real network calls in tests
 
 ## Run (standalone)
 ```bash
