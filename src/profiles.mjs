@@ -14,7 +14,7 @@ const DEFAULTS = {
   summarize_retrieval: { model: 'llama3:latest', temperature: 0.1, max_tokens: 256 },
   rerank: { model: 'bge-reranker:latest' },
   intent: { model: 'phi4:3.8b', temperature: 0.0 },
-  chunking: { chunk_tokens: 512, overlap_tokens: 50 }
+  chunking: { chunk_tokens: 512, overlap_tokens: 50 },
 };
 
 let cache = null;

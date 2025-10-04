@@ -37,7 +37,7 @@ function extractTextFromChat(out) {
   } catch (_) { return ''; }
 }
 
-export async function chatCompletion({ model, messages, temperature, top_p, max_tokens, stream = false } = {}) {
+export async function chatCompletion({ model, messages, temperature, top_p, max_tokens, stream: _stream = false } = {}) {
   const body = { model: model || OAI_DEFAULT_MODEL, messages, temperature, top_p, max_tokens, stream: false };
   const out = await httpJson('/chat/completions', { method: 'POST', body });
   const text = extractTextFromChat(out);
