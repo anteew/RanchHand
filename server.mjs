@@ -28,12 +28,12 @@ registerTool({
       temperature: { type: 'number' },
       top_p: { type: 'number' },
       max_tokens: { type: 'number' },
-      stream: { type: 'boolean' },
+      stream: { type: 'boolean' }
     },
     required: ['messages'],
     additionalProperties: false,
   },
-}, async ({ model, messages, temperature, top_p, max_tokens, stream: _stream }) => {
+}, async ({ model, messages, temperature, top_p, max_tokens, stream }) => {
   try { const res = await chatCompletion({ model, messages, temperature, top_p, max_tokens, stream: false }); return { ok: true, text: res.text, raw: res.raw }; }
   catch (e) { return { ok: false, reason: String(e) }; }
 });

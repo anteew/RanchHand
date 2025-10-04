@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { listModels, chatCompletion, chatCompletionStream, embeddings } from './src/oai_client.mjs';
+import { listModels, chatCompletion, chatCompletionStream, collectStreamToText, embeddings } from './src/oai_client.mjs';
 
 const args = process.argv.slice(2);
 const cmd = args[0] || 'help';
@@ -23,8 +23,9 @@ async function run() {
     if (!text) { console.error('chat requires -m "message"'); process.exit(2); }
     const messages = [{ role: 'user', content: text }];
     if (stream) {
+      let buf = '';
       for await (const { delta } of chatCompletionStream({ model, messages })) {
-        process.stdout.write(delta);
+        buf += delta; process.stdout.write(delta);
       }
       process.stdout.write('\n');
       return;
